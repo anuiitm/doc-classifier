@@ -38,7 +38,7 @@ def main():
         path = os.path.join(SAMPLES_DIR, fname)
 
         # Classify
-        result = classify_file(path, lenient=True)
+        result = classify_file(path, lenient=True, ocr_lang="eng+hin")
 
         if not result.get("ok"):
             print(f"{fname:<35s} {'ERROR':<18s} {'—':<18s} {'—':<8s} {result.get('error', '')[:40]}")
@@ -50,7 +50,7 @@ def main():
         # Get raw text for field extraction (first usable candidate)
         raw_text = ""
         try:
-            raw_text = next((t for t, _ in text_candidates(path)), "")
+            raw_text = next((t for t, _ in text_candidates(path, ocr_lang="eng+hin")), "")
         except Exception:
             pass
 
