@@ -23,8 +23,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
-from engine import classify_file
-from engine.store import extract_document_fields
+from engine.gemini_engine import classify_file_gemini as classify_file
 
 app = Flask(__name__, static_folder="static", static_url_path="/")
 CORS(app)
@@ -46,25 +45,12 @@ def _save_and_classify(file_storage, lang):
     file_storage.save(save_path)
     
     try:
-        result = classify_file(save_path, ocr_lang=lang)
+        # Call Gemini!
+        result = classify_file(save_path)
         result["file"] = orig_name
         result["server_filename"] = unique_name
         
-        if result.get("ok") and result.get("raw_text") and result.get("decision") not in ("UNKNOWN", "ERROR"):
-            extra = extract_document_fields(result["decision"], result["raw_text"], result.get("identifier"))
-            
-            # The user requested that for Bank docs (cheque, statement, passbook) the identifier should be the account number
-            if result["decision"] in ["BANK_STATEMENT", "PASSBOOK", "CHEQUE", "BANK_PASSBOOK"]:
-                acc_no = extra.get("Account No")
-                if acc_no:
-                    result["identifier"] = acc_no
-                else:
-                    result["identifier"] = "Not found"
-                    
-            result["extracted_fields"] = extra
-        else:
-            result["extracted_fields"] = {}
-            
+        # Gemini directly returns extracted_fields, no need to run the old regex extractors.
         if "raw_text" in result:
             del result["raw_text"]
             
@@ -156,7 +142,7 @@ def review_document():
 
 
 if __name__ == "__main__":
-    print("\n  Document Classification Engine API")
-    print("  http://127.0.0.1:7001   (Portal UI)")
-    print("  http://127.0.0.1:7001/classify   (API endpoint)\n")
-    app.run(host="127.0.0.1", port=7001, debug=False)
+    print("\n  Document Classification Gemini API")
+    print("  http://127.0.0.1:7002   (Portal UI)")
+    print("  http://127.0.0.1:7002/classify   (API endpoint)\n")
+    app.run(host="127.0.0.1", port=7002, debug=False)

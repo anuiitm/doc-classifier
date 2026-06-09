@@ -43,6 +43,7 @@ def classify_file(path: str, ocr_lang: str = "eng", ocr: bool = True,
 
     best = None
     best_method = None
+    best_text = None
     tried = 0
 
     try:
@@ -53,6 +54,7 @@ def classify_file(path: str, ocr_lang: str = "eng", ocr: bool = True,
             if best is None or result["confidence"] > best["confidence"]:
                 best = result
                 best_method = method
+                best_text = text
 
             # early exit on a confident, validated hit (strict mode), or a
             # confident shape match (lenient mode).
@@ -60,6 +62,7 @@ def classify_file(path: str, ocr_lang: str = "eng", ocr: bool = True,
             if confident and (result["identifier_valid"] or lenient):
                 best = result
                 best_method = method
+                best_text = text
                 break
 
             # if the digital text layer was rich (a real text PDF) and it still
@@ -82,6 +85,7 @@ def classify_file(path: str, ocr_lang: str = "eng", ocr: bool = True,
         "extraction_method": best_method,
         "candidates_tried": tried,
         "elapsed_ms": int((time.time() - started) * 1000),
+        "raw_text": best_text
     })
     return best
 

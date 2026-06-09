@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuClassify | Review Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar: Upload & Queue -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+                <h1>DocuClassify</h1>
+            </div>
+            
+            <div class="upload-section" id="drop-zone">
+                <div class="upload-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </div>
+                <p>Drag & Drop files here</p>
+                <p class="small">or click to browse</p>
+                <input type="file" id="file-input" multiple accept="image/*,application/pdf" hidden>
+            </div>
+            
+            <div class="queue-section">
+                <h2>Pending Review <span id="queue-count" class="badge">0</span></h2>
+                <div class="queue-list" id="queue-list">
+                    <!-- Queue items populated via JS -->
+                    <div class="empty-state">No documents in queue</div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Area: Review Panel -->
+        <main class="review-panel">
+            <div class="empty-preview" id="empty-preview">
+                Select a document from the queue to review
+            </div>
+            
+            <div class="review-content hidden" id="review-content">
+                <div class="document-viewer">
+                    <div class="viewer-header">
+                        <h3 id="preview-filename">document.pdf</h3>
+                        <a id="preview-link" target="_blank" href="#" class="view-original">View Original</a>
+                    </div>
+                    <div class="viewer-body" id="viewer-body">
+                        <!-- Embed or Img tag injected here -->
+                    </div>
+                </div>
+                
+                <div class="classification-details">
+                    <div class="details-card">
+                        <h3>Classification Result</h3>
+                        <div class="detail-row">
+                            <span class="label">Document Type</span>
+                            <span class="value badge-primary" id="det-type">AADHAAR</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Identifier</span>
+                            <span class="value" id="det-id">XXXX-XXXX-XXXX</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Confidence</span>
+                            <div class="confidence-bar">
+                                <div class="fill" id="det-conf-fill" style="width: 85%;"></div>
+                            </div>
+                            <span class="value-small" id="det-conf-text">85%</span>
+                        </div>
+                        <div class="detail-row" id="det-needs-review-row">
+                            <span class="label">Status</span>
+                            <span class="value text-warning" id="det-status">Needs Human Review</span>
+                        </div>
+                        <div id="extra-fields-container">
+                            <!-- Extracted fields injected here -->
+                        </div>
+                    </div>
+                    
+                    <div class="action-card">
+                        <h3>Decision</h3>
+                        <div class="action-buttons">
+                            <button class="btn btn-approve" id="btn-approve">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                Approve
+                            </button>
+                            <button class="btn btn-decline" id="btn-decline">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                Decline
+                            </button>
+                        </div>
+                        
+                        <div class="decline-reason-box hidden" id="decline-reason-box">
+                            <label for="decline-reason">Reason for declining</label>
+                            <textarea id="decline-reason" rows="3" placeholder="e.g., Blurry image, mismatched ID..."></textarea>
+                            <div class="decline-actions">
+                                <button class="btn btn-sm btn-ghost" id="btn-cancel-decline">Cancel</button>
+                                <button class="btn btn-sm btn-danger" id="btn-confirm-decline">Confirm Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Loading overlay -->
+            <div class="loading-overlay hidden" id="loading-overlay">
+                <div class="spinner"></div>
+                <p>Processing documents...</p>
+            </div>
+        </main>
+        
+        <!-- Toast Notification -->
+        <div class="toast hidden" id="toast">Message here</div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

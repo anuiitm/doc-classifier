@@ -198,6 +198,36 @@ def _extract_account_type(text: str) -> str | None:
 _ID_DOC_TYPES = {"AADHAAR", "PASSPORT", "DL", "VOTER_ID"}
 _BANK_TYPES   = {"BANK_STATEMENT", "BANK_PASSBOOK", "CHEQUE"}
 
+def extract_document_fields(doc_type: str, text: str, identifier: str = None) -> dict:
+    """Extract fields from text based on doc_type, returning a dictionary."""
+    fields = {}
+    if doc_type in _ID_DOC_TYPES:
+        fields["Name"] = _extract_name(text)
+        fields["DOB"] = str(_extract_dob(text)) if _extract_dob(text) else None
+        fields["Gender"] = _extract_gender(text)
+        fields["Address"] = _extract_address(text)
+        
+        if doc_type == "AADHAAR": fields["Aadhaar Number"] = identifier
+        elif doc_type == "PASSPORT": fields["Passport Number"] = identifier
+        elif doc_type == "DL": fields["DL Number"] = identifier
+        elif doc_type == "VOTER_ID": fields["Voter ID"] = identifier
+
+    elif doc_type == "PAN":
+        fields["Name"] = _extract_name(text)
+        fields["DOB"] = str(_extract_dob(text)) if _extract_dob(text) else None
+        fields["Father's Name"] = _extract_father_name(text)
+        fields["PAN Number"] = identifier
+        
+    elif doc_type in _BANK_TYPES:
+        fields["Account No"] = _extract_account_no(text)
+        fields["Bank Name"] = _extract_bank_name(text)
+        fields["IFSC"] = _extract_ifsc(text)
+    
+    # Receipts like INVOICE, INSURANCE, ROAD_TAX get no extra fields (UI only shows classification name)
+    
+    # replace None values with "Not Found" so they still appear in the UI
+    return {k: (v if v is not None else "Not Found") for k, v in fields.items()}
+
 
 def store_result(
     customer_id: str,
